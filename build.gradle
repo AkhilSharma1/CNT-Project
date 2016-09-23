@@ -1,0 +1,40 @@
+buildscript {
+
+    ext.kotlin_version = '1.0.3'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+    }
+}
+
+allprojects {
+    group 'com.sem1.projects'
+    version '0.1'
+}
+
+subprojects {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    apply plugin: 'java'
+
+
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+
+    dependencies {
+
+//        testCompile group: 'junit', name: 'junit', version: '4.11'
+        testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.0-M2'
+
+    }
+}

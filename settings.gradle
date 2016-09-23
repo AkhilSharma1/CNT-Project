@@ -1,0 +1,4 @@
+rootProject.name = 'cnt'
+include 'client'
+include 'server'
+
