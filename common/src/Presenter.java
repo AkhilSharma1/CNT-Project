@@ -5,7 +5,7 @@ import worker.WorkerContract;
 /**
  * Created by akhil on 28/9/16.
  */
-public abstract class Program implements UserInputThreadUtil.UserInputListener {
+public abstract class Presenter implements UserInputThreadUtil.UserInputListener {
 
     private UserInputThreadUtil userInputThreadUtil;
 
