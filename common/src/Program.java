@@ -1,9 +1,16 @@
+import worker.ThreadManager;
+import worker.UserInputThreadUtil;
+import worker.WorkerContract;
+
 /**
  * Created by akhil on 28/9/16.
  */
 public abstract class Program implements UserInputThreadUtil.UserInputListener {
 
     private UserInputThreadUtil userInputThreadUtil;
+
+    //TODO use a dependency injector such as dagger2
+    private WorkerContract worker;
 
 
     public abstract void processUserInput(String userInput);
@@ -27,12 +34,18 @@ public abstract class Program implements UserInputThreadUtil.UserInputListener {
         //start listening to user input
         userInputThreadUtil = new UserInputThreadUtil(this);
         userInputThreadUtil.startListeningToConsoleInput();
+
+        worker = new ThreadManager();
+
     }
 
     protected void stop() {
         userInputThreadUtil.stopListeningToConsoleInput();
-
+        //TODO signal all threads to stop
         onStop();
     }
 
+    public WorkerContract getWorker() {
+        return worker;
+    }
 }

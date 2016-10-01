@@ -1,3 +1,5 @@
+package worker;
+
 import java.util.Scanner;
 
 /**
@@ -21,7 +23,6 @@ public class UserInputThreadUtil {
             String input = userInput.next();
             receiver.onUserInput(input);
         }
-
         //TODO destroy other threads indirectly.
     }
 
@@ -30,7 +31,7 @@ public class UserInputThreadUtil {
 
     }
 
-    interface UserInputListener {
+    public interface UserInputListener {
         void onUserInput(String userInput);
     }
 
