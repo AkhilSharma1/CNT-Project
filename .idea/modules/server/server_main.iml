@@ -5,13 +5,11 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../server/src/main">
       <sourceFolder url="file://$MODULE_DIR$/../../../server/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../server/src/main/kotlin" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../../server/src/main/resources" type="java-resource" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.0.3" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-runtime:1.0.3" level="project" />
-    <orderEntry type="module" module-name="common" exported="" />
+    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.7" level="project" />
+    <orderEntry type="module" module-name="common_main" />
   </component>
 </module>

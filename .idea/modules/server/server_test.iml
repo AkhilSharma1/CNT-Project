@@ -5,15 +5,14 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../server/src/test">
       <sourceFolder url="file://$MODULE_DIR$/../../../server/src/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../server/src/test/kotlin" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../../server/src/test/resources" type="java-test-resource" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="server_main" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.0.3" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.7" level="project" />
+    <orderEntry type="module" module-name="common_main" />
     <orderEntry type="library" name="Gradle: org.junit.jupiter:junit-jupiter-api:5.0.0-M2" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-runtime:1.0.3" level="project" />
     <orderEntry type="library" name="Gradle: org.opentest4j:opentest4j:1.0.0-M1" level="project" />
     <orderEntry type="library" name="Gradle: org.junit.platform:junit-platform-commons:1.0.0-M2" level="project" />
   </component>

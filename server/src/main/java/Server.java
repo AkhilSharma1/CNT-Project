@@ -1,5 +1,4 @@
-import worker.ThreadManager;
-import worker.WorkerContract;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -9,17 +8,12 @@ import java.util.HashMap;
 /**
  * Created by akhil on 26/9/16.
  */
-public class Server extends Program {
+public class Server extends Presenter {
 
     private static HashMap<String, String> users = new HashMap<>();
     volatile boolean keepRunning = true;
+    volatile ServerSocket serverSocket;
     private int userCounter = 1;
-
-
-    public Server() {
-
-    }
-
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -33,51 +27,60 @@ public class Server extends Program {
 
     @Override
     public void onStart() {
+        final Gson gson = new Gson();
         System.out.println("Welcome! Server is starting...");
         System.out.println("Type quit to close server");
 
-//        startServerSocketListenerThread();
+        //TODO read port number from a config file
+        final int sPort = 8080;
+        try {
+            serverSocket = new ServerSocket(sPort);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        startServerSocketListenerThread();
 
     }
 
     @Override
     public void onStop() {
+        keepRunning = false;
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("server shutting down...");
-
-        //TODO signal all threads to stop
     }
 
 
     private void startServerSocketListenerThread() {
 
-        //TODO use a dependency injector such as dagger2
-        WorkerContract worker = new ThreadManager();
+
         try {
             new Thread() {
                 //The server will be listening on this port number
-                private static final int sPort = 8080;
-                //TODO read port number from a config file
+
                 //TODO learn to interrupt this thread
-
-
-                ServerSocket listener = new ServerSocket(sPort);
 
                 @Override
                 public void run() {
 
                     try {
                         while (keepRunning) {
-                            Socket socket = listener.accept();
+                            Socket socket = serverSocket.accept();
 
                             String newUser = createNewUser();
-                            worker.addUser(newUser, socket);
+                            Server.this.getWorker().addUser(newUser, socket);
 
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
                         try {
-                            listener.close();
+                            serverSocket.close();
+                            //workerthreadmanager
 
 
                         } catch (IOException e) {
