@@ -20,31 +20,18 @@ class UserThreadGroup extends ThreadGroup {
         super(userName);
         this.socket = socket;
 
-        initThreads(userName, socket);
+        try {
+            initThreads(userName, socket);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
-    private void initThreads(String userName, Socket socket) {
+    private void initThreads(String userName, Socket socket) throws IOException {
 
-
-        senderThread = new SenderThread(this, userName + SENDER_THREAD_NAME, socket);
-
-
-        receiverThread = new ReceiverThread(this, userName + RECEIVER_THREAD_NAME, socket);
-
-
-    }
-
-    public ReceiverThread getReceiverThread() {
-        return receiverThread;
-    }
-
-    public SenderThread getSenderThread() {
-        return senderThread;
-    }
-
-    public void sendMessage(String message) {
-
+        senderThread = new SenderThread(this, userName + SENDER_THREAD_NAME, socket.getOutputStream());
+        receiverThread = new ReceiverThread(this, userName + RECEIVER_THREAD_NAME, socket.getInputStream());
     }
 
     @Override
@@ -66,5 +53,19 @@ class UserThreadGroup extends ThreadGroup {
         super.finalize();
     }
 
+
+    public void sendString(String data) {
+        senderThread.send(data);
+    }
+/*
+
+    public void sendD(TextMessage data) {
+
+//        if(userThreadGroup==null)
+//            addUserThreadGroup(userName)
+
+//        userThreadGroup.sendMessage(message);
+    }
+*/
 
 }

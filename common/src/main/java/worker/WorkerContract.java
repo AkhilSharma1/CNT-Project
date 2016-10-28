@@ -9,13 +9,10 @@ public interface WorkerContract {
 
     /* Implemented by the entity which manages threads*/
 
-    void addUser(String userName, Socket socket);
 
-    void removeUser(String userName);
+    void sendData(String user, String dataString);
 
-    void sendMessage(String userName, String message);
-
-
+    void addUser(Socket socket, String userName);
 
     /* Implemented by the entity which wants to receive messages from Threads*/
 

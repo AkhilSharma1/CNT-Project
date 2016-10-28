@@ -1,18 +1,19 @@
 import com.google.gson.Gson;
+import model.WelcomeMessage;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 /**
  * Created by akhil on 26/9/16.
  */
 public class Server extends Presenter {
 
-    private static HashMap<String, String> users = new HashMap<>();
     volatile boolean keepRunning = true;
     volatile ServerSocket serverSocket;
+    private ArrayList<String> users = new ArrayList<>();
     private int userCounter = 1;
 
     public static void main(String[] args) {
@@ -27,7 +28,6 @@ public class Server extends Presenter {
 
     @Override
     public void onStart() {
-        final Gson gson = new Gson();
         System.out.println("Welcome! Server is starting...");
         System.out.println("Type quit to close server");
 
@@ -70,10 +70,7 @@ public class Server extends Presenter {
                     try {
                         while (keepRunning) {
                             Socket socket = serverSocket.accept();
-
-                            String newUser = createNewUser();
-                            Server.this.getWorker().addUser(newUser, socket);
-
+                            Server.this.newConnection(socket);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -100,7 +97,32 @@ public class Server extends Presenter {
 
     }
 
-    private String createNewUser() {
+    private void newConnection(Socket socket) {
+        String newUser = newUserName();
+        createNewUserThreads(socket, newUser);
+
+        sendWelcomeMessage(newUser);
+        users.add(newUser);
+
+    }
+
+    private void sendWelcomeMessage(String newUser) {
+        String welcomeMessage = createWelcomeMessage(newUser, users);
+        WelcomeMessage welcomeData = new WelcomeMessage(newUser, welcomeMessage);
+
+        //TODO singleton
+        Gson gson = new Gson();
+        String data = gson.toJson(welcomeData);
+        getWorker().sendData(newUser, data);
+
+    }
+
+    private String createWelcomeMessage(String newUser, ArrayList<String> users) {
+        return "Welcome " + newUser + "! Online users are :" + users.toString();
+    }
+
+
+    private String newUserName() {
         return "user" + userCounter++;
 
     }

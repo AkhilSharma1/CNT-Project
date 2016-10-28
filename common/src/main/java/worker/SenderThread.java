@@ -1,36 +1,33 @@
 package worker;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
+import java.io.OutputStream;
 
 /**
  * Created by akhil on 25/9/16.
  */
 public class SenderThread extends Thread {
 
-    private ObjectOutputStream out = null;
+    private BufferedOutputStream out = null;
 
-    public SenderThread(ThreadGroup threadGroup, String sender, Socket socket) {
+    SenderThread(ThreadGroup threadGroup, String sender, OutputStream out) {
         super(threadGroup, sender);
+        this.out = new BufferedOutputStream(out);
+    }
 
+    void send(String msg) {
         try {
-            out = new ObjectOutputStream(socket.getOutputStream());
+            out.write(msg.getBytes());
             out.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    void sendMessage(String msg) {
-        try {
-            //stream write the message
-            out.writeObject(msg);
-            out.flush();
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
+    @Override
+    public void run() {
+
+
     }
-
-
 }
