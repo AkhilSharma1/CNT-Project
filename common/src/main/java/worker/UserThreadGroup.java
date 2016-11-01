@@ -1,5 +1,8 @@
 package worker;
 
+import model.Message;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -11,13 +14,15 @@ class UserThreadGroup extends ThreadGroup {
 
     private static final String RECEIVER_THREAD_NAME = "_receiver";
     private static final String SENDER_THREAD_NAME = "_sender";
+    private final ThreadManager threadManager;
     private final Socket socket;
     private ReceiverThread receiverThread;
     private SenderThread senderThread;
 
 
-    UserThreadGroup(String userName, Socket socket) {
+    UserThreadGroup(ThreadManager threadManager, String userName, Socket socket) {
         super(userName);
+        this.threadManager = threadManager;
         this.socket = socket;
 
         try {
@@ -54,18 +59,24 @@ class UserThreadGroup extends ThreadGroup {
     }
 
 
-    public void sendString(String data) {
-        senderThread.send(data);
+    public void sendMessage(Message data) {
+        senderThread.sendMessage(data);
     }
-/*
 
-    public void sendD(TextMessage data) {
-
-//        if(userThreadGroup==null)
-//            addUserThreadGroup(userName)
-
-//        userThreadGroup.sendMessage(message);
+    public void sendFile(File file) {
+        senderThread.sendFile(file);
     }
-*/
 
+
+    public void onFileReceived(File file) {
+        threadManager.onFileReceived(file);
+
+
+    }
+
+    public void onMessageReceived(Message message) {
+        threadManager.onMessageReceived(message);
+
+
+    }
 }

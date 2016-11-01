@@ -1,6 +1,9 @@
 package worker;
 
+import model.Message;
+
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -28,6 +31,14 @@ public class SenderThread extends Thread {
     @Override
     public void run() {
 
+
+    }
+
+    public void sendMessage(Message messageObj) {
+
+    }
+
+    public void sendFile(File file) {
 
     }
 }

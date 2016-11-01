@@ -1,6 +1,9 @@
 package worker;
 
+import model.Message;
+
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.InputStream;
 
 /**
@@ -8,13 +11,24 @@ import java.io.InputStream;
  */
 public class ReceiverThread extends Thread {
 
+    private final UserThreadGroup threadGroup;
     private BufferedInputStream bufferedInputStream = null;
 
 
-    public ReceiverThread(ThreadGroup threadGroup, String receiver, InputStream inputStream) {
+    public ReceiverThread(UserThreadGroup threadGroup, String receiver, InputStream inputStream) {
         super(threadGroup, receiver);
+        this.threadGroup = threadGroup;
         bufferedInputStream = new BufferedInputStream(inputStream);
     }
 
+
+    void fileReceived(File file) {
+        threadGroup.onFileReceived(file);
+    }
+
+
+    void MessageReceived(Message message) {
+        threadGroup.onMessageReceived(message);
+    }
 
 }

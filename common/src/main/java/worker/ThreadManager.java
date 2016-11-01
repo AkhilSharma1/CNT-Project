@@ -1,8 +1,8 @@
 package worker;
 
-import com.google.gson.Gson;
-import model.TextMessage;
+import model.Message;
 
+import java.io.File;
 import java.net.Socket;
 import java.util.HashMap;
 
@@ -27,14 +27,19 @@ public class ThreadManager implements WorkerContract {
         return instance;
     }
 
-    public static void createThreadsForUser(String userName) {
 
+    @Override
+    public void sendMessage(String toUser, Message message) {
 
     }
 
+    @Override
+    public void sendFile(String toUser, File file) {
+
+    }
 
     public void addUser(Socket socket, String userName) {
-        UserThreadGroup threadGroup = new UserThreadGroup(userName, socket);
+        UserThreadGroup threadGroup = new UserThreadGroup(this, userName, socket);
         userThreadMap.put(userName, threadGroup);
 
     }
@@ -49,22 +54,12 @@ public class ThreadManager implements WorkerContract {
     }
 
 
-    @Override
-    public void sendData(String newUser, String dataString) {
+    public void onFileReceived(File file) {
 
     }
 
+    public void onMessageReceived(Message message) {
 
-    @Override
-    public void sendData(TextMessage data) {
-        String userName = data.getFromUser();
-        UserThreadGroup userThreadGroup = userThreadMap.get(userName);
-
-        Gson gson = new Gson();
-        String string = gson.toJson(data);
-        userThreadGroup.sendString(string);
 
     }
-
-
 }

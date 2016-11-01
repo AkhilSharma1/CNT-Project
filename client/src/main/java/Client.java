@@ -1,20 +1,12 @@
 /**
- * Created by akhil on 29/9/16.
+ * Created by akhil on 29/10/16.
  */
-public class Client extends Presenter {
+public class Client {
 
-    @Override
-    public void onStart() {
+    public static void main(String[] args) {
 
-    }
-
-    @Override
-    public void processUserInput(String userInput) {
-
-    }
-
-    @Override
-    public void onStop() {
-
+        //Add debug logs
+        new ClientConsoleView(args[1]);
+//TODO SEND welcome broadcast message on joining
     }
 }

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Created by akhil on 23/9/16.
  */
-public class ClientTest {
+public class ClientPresenterTest {
 
     @Test
     public void testJunit5() throws Exception {

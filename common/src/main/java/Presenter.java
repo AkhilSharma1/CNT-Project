@@ -1,30 +1,37 @@
-import com.google.gson.Gson;
-import model.TextMessage;
+import model.Message;
 import worker.ThreadManager;
-import worker.UserInputThreadUtil;
 import worker.WorkerContract;
 
+import java.io.File;
 import java.net.Socket;
 
 /**
  * Created by akhil on 28/9/16.
  */
-public abstract class Presenter implements UserInputThreadUtil.UserInputListener {
+public abstract class Presenter implements PresenterContract, WorkerContract.onDataReceiveCallback {
 
-    private UserInputThreadUtil userInputThreadUtil;
 
+    ViewContract view;
     //TODO use a dependency injector such as dagger2
     private WorkerContract worker;
 
-    public WorkerContract getWorker() {
+    Presenter(ViewContract view) {
+        this.view = view;
+        worker = new ThreadManager();
+        onStart();
+
+    }
+
+    WorkerContract getWorker() {
         return worker;
     }
 
-    public abstract void processUserInput(String userInput);
+    public abstract void sendData(Message message);
 
     public abstract void onStart();
 
     public abstract void onStop();
+
 
     @Override
     public void onUserInput(String userInput) {
@@ -32,40 +39,37 @@ public abstract class Presenter implements UserInputThreadUtil.UserInputListener
         if (userInput.equalsIgnoreCase("quit")) {
             stop();
         }
-        processUserInput(userInput);
     }
 
-    public final void init() {
-        onStart();
-
-        //start listening to user input
-        userInputThreadUtil = new UserInputThreadUtil(this);
-        userInputThreadUtil.startListeningToConsoleInput();
-
-        worker = new ThreadManager();
-
-    }
-
-    protected void stop() {
-        userInputThreadUtil.stopListeningToConsoleInput();
+    private void stop() {
+        view.stopListeningToInput();
         //TODO signal all threads to stop
         onStop();
     }
 
-    protected void sendData(String from, String to, String exclude,
-                            TextMessage.DataTypes type, String filePath) {
+    void sendMessage(String toUser, Message message) {
+        worker.sendMessage(toUser, message);
 
-        Gson gson = new Gson();//TODO use Dagger 2
-
-        // create a new object every time?
-        TextMessage data = new TextMessage(from, to, exclude, type, filePath);
-        worker.sendData(newUser, data);
     }
 
-    public void createNewUserThreads(Socket socket, String userName) {
+    void sendFile(String toUser, File file) {
+        worker.sendFile(toUser, file);
+    }
+
+
+    void createNewConnection(Socket socket, String userName) {
         worker.addUser(socket, userName);
+    }
+
+
+    @Override
+    public void onFileReceived(String user, File file) {
 
     }
 
+    @Override
+    public void onMessageReceived(Message message) {
+
+    }
 
 }
