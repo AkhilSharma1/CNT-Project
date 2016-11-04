@@ -1,10 +1,9 @@
 package worker;
 
-import model.Message;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Created by akhil on 25/9/16.
@@ -15,18 +14,21 @@ class UserThreadGroup extends ThreadGroup {
     private static final String RECEIVER_THREAD_NAME = "_receiver";
     private static final String SENDER_THREAD_NAME = "_sender";
     private final ThreadManager threadManager;
+    private final String userId;
     private final Socket socket;
     private ReceiverThread receiverThread;
     private SenderThread senderThread;
+    private ArrayBlockingQueue arrayBlockingQueue;
 
 
-    UserThreadGroup(ThreadManager threadManager, String userName, Socket socket) {
-        super(userName);
+    UserThreadGroup(ThreadManager threadManager, String userId, Socket socket) {
+        super(userId);
         this.threadManager = threadManager;
+        this.userId = userId;
         this.socket = socket;
 
         try {
-            initThreads(userName, socket);
+            initThreads(userId, socket);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -35,8 +37,14 @@ class UserThreadGroup extends ThreadGroup {
 
     private void initThreads(String userName, Socket socket) throws IOException {
 
-        senderThread = new SenderThread(this, userName + SENDER_THREAD_NAME, socket.getOutputStream());
+        arrayBlockingQueue = new ArrayBlockingQueue(10);
+
+        senderThread = new SenderThread(this, userName + SENDER_THREAD_NAME,
+                socket.getOutputStream(), arrayBlockingQueue);
         receiverThread = new ReceiverThread(this, userName + RECEIVER_THREAD_NAME, socket.getInputStream());
+
+        senderThread.start();
+        receiverThread.start();
     }
 
     @Override
@@ -46,9 +54,7 @@ class UserThreadGroup extends ThreadGroup {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return super.isDestroyed();
-
     }
 
 
@@ -59,24 +65,27 @@ class UserThreadGroup extends ThreadGroup {
     }
 
 
-    public void sendMessage(Message data) {
-        senderThread.sendMessage(data);
+    public void sendMessageJson(String jsonString) {
+        try {
+            arrayBlockingQueue.put(jsonString);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void sendFile(File file) {
-        senderThread.sendFile(file);
+        try {
+            arrayBlockingQueue.put(file);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
-
 
     public void onFileReceived(File file) {
-        threadManager.onFileReceived(file);
-
-
+        threadManager.onFileReceived(userId, file);
     }
 
-    public void onMessageReceived(Message message) {
-        threadManager.onMessageReceived(message);
-
-
+    public void onMessageReceived(String messageString) {
+        threadManager.onMessageReceived(userId, messageString);
     }
 }

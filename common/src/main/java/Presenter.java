@@ -1,3 +1,4 @@
+import com.google.gson.Gson;
 import model.Message;
 import worker.ThreadManager;
 import worker.WorkerContract;
@@ -11,24 +12,22 @@ import java.net.Socket;
 public abstract class Presenter implements PresenterContract, WorkerContract.onDataReceiveCallback {
 
 
+    private final Gson gson;
     ViewContract view;
     //TODO use a dependency injector such as dagger2
     private WorkerContract worker;
 
     Presenter(ViewContract view) {
+        gson = new Gson();
         this.view = view;
-        worker = new ThreadManager();
-        onStart();
-
+        worker = new ThreadManager(this);
     }
 
-    WorkerContract getWorker() {
-        return worker;
-    }
 
-    public abstract void sendData(Message message);
+    public abstract void onTextMessageReceived(String userId, Message message);
 
-    public abstract void onStart();
+    public abstract void onFileMessageReceived(String userId, Message message);
+
 
     public abstract void onStop();
 
@@ -47,13 +46,14 @@ public abstract class Presenter implements PresenterContract, WorkerContract.onD
         onStop();
     }
 
-    void sendMessage(String toUser, Message message) {
-        worker.sendMessage(toUser, message);
+    void sendMessage(String toUserId, Message message) {
+        String messageJsonString = gson.toJson(message);
+        worker.sendMessage(toUserId, messageJsonString);
 
     }
 
-    void sendFile(String toUser, File file) {
-        worker.sendFile(toUser, file);
+    void sendFile(String toUserId, File file) {
+        worker.sendFile(toUserId, file);
     }
 
 
@@ -61,15 +61,16 @@ public abstract class Presenter implements PresenterContract, WorkerContract.onD
         worker.addUser(socket, userName);
     }
 
-
     @Override
-    public void onFileReceived(String user, File file) {
+    final public void onMessageReceived(String fromUserId, String messageString) {
 
+        Message message = gson.fromJson(messageString, Message.class);
+
+        boolean isTextMessage = message.getMessage() != null;
+
+        if (isTextMessage)
+            onTextMessageReceived(fromUserId, message);
+        else
+            onFileMessageReceived(fromUserId, message);
     }
-
-    @Override
-    public void onMessageReceived(Message message) {
-
     }
-
-}

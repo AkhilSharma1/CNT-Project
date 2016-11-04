@@ -10,16 +10,14 @@ public class ServerConsoleView implements ViewContract {
     private Presenter presenter;
 
 
-    public ServerConsoleView(String userName) {
-
+    public ServerConsoleView() {
         presenter = new ServerPresenter(this);
-
         startListeningToInput();
     }
 
     @Override
     public void showOutput(String output) {
-
+        System.out.println(output);
     }
 
 
@@ -36,7 +34,6 @@ public class ServerConsoleView implements ViewContract {
     @Override
     public void stopListeningToInput() {
         keepRunning = false;
-
     }
 
 }

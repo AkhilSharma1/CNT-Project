@@ -6,7 +6,7 @@ public class Client {
     public static void main(String[] args) {
 
         //Add debug logs
-        new ClientConsoleView(args[1]);
+        new ClientConsoleView(args[0]);
 //TODO SEND welcome broadcast message on joining
     }
 }

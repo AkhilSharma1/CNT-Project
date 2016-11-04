@@ -19,7 +19,7 @@ public class ClientConsoleView implements ViewContract {
 
     @Override
     public void showOutput(String output) {
-
+        System.out.println(output);
     }
 
 
@@ -27,7 +27,7 @@ public class ClientConsoleView implements ViewContract {
         Scanner userInput = new Scanner(System.in);
 
         while (keepRunning) {
-            String input = userInput.next();
+            String input = userInput.nextLine();
             presenter.onUserInput(input);
         }
         //TODO destroy other threads indirectly.

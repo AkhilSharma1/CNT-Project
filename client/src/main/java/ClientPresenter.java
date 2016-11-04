@@ -1,4 +1,5 @@
 import model.Message;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,14 +16,18 @@ public class ClientPresenter extends Presenter {
     public ClientPresenter(ClientConsoleView clientConsoleView, String userName) {
         super(clientConsoleView);
         this.userName = userName;
+
+        onStart();
     }
 
-    @Override
     public void onStart() {
         //initiate a connection to Server
         try {
             Socket requestSocket = new Socket("localhost", 8080);
             createNewConnection(requestSocket, SERVER_NAME);
+            //send a broadcast message to all other users
+            Message joinBroadcastMessage = new Message(userName, null, null, null, "@" + userName + " joined!");
+            sendMessage(SERVER_NAME, joinBroadcastMessage);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -30,7 +35,7 @@ public class ClientPresenter extends Presenter {
 
     @Override
     public void onStop() {
-
+        System.exit(0);
     }
 
 
@@ -47,13 +52,32 @@ public class ClientPresenter extends Presenter {
 
     public void sendData(Message message) {
         sendMessage(SERVER_NAME, message);
-        if (message.getFilePath() != null) {
-            File file = new File(message.getFilePath());
+        if (message.getFileName() != null) {
+            File file = new File(message.getFileName());
             sendFile("server", file);
         }
     }
 
+    @Override
+    public void onTextMessageReceived(String fromUserId, Message message) {
+        String fromUser = message.getFromUser();
+        String textMessage = message.getMessage();
 
+        String consoleOutput = "@" + fromUser + " : " + textMessage;
+        view.showOutput(consoleOutput);
+    }
+
+    @Override
+    public void onFileMessageReceived(String fromUserId, Message message) {
+        String fromUser = message.getFromUser();
+        String fileName = message.getFileName();
+
+        String consoleOutput = "@" + fromUser + " : " + "incoming file " + fileName;
+        view.showOutput(consoleOutput);
+    }
+
+
+    @Nullable
     private Message processUserInput(String userInput) {
         boolean isUnicast = false;
         boolean isBroadcast = false;
@@ -134,4 +158,15 @@ public class ClientPresenter extends Presenter {
 
         return message;
     }
+
+
+    @Override
+    public void onFileReceived(String fromUserId, File file) {
+        String consoleOutput = "@" + fromUserId + " : " + " file " + file.getName() +
+                "received succesfully";
+        view.showOutput(consoleOutput);
+
+    }
+
+
 }

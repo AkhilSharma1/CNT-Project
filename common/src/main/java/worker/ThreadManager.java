@@ -1,7 +1,5 @@
 package worker;
 
-import model.Message;
-
 import java.io.File;
 import java.net.Socket;
 import java.util.HashMap;
@@ -11,55 +9,39 @@ import java.util.HashMap;
  */
 public class ThreadManager implements WorkerContract {
 
-    private static ThreadManager instance = null;
 
-    private static HashMap<String, UserThreadGroup> userThreadMap = new HashMap<>();
+    private static HashMap<String, UserThreadGroup> userIdThreadMap = new HashMap<>();
+    private final onDataReceiveCallback presenter;
 
 
-    public ThreadManager() {
-        //avoid instantiation
-    }
-
-    public static ThreadManager getInstance() {
-        if (instance == null) {
-            instance = new ThreadManager();
-        }
-        return instance;
+    public ThreadManager(WorkerContract.onDataReceiveCallback presenter) {
+        this.presenter = presenter;
     }
 
 
     @Override
-    public void sendMessage(String toUser, Message message) {
-
+    public void sendMessage(String toUserId, String messageJsonString) {
+        UserThreadGroup userThreadGroup = userIdThreadMap.get(toUserId);
+        userThreadGroup.sendMessageJson(messageJsonString);
     }
 
     @Override
-    public void sendFile(String toUser, File file) {
-
+    public void sendFile(String toUserId, File file) {
+        UserThreadGroup userThreadGroup = userIdThreadMap.get(toUserId);
+        userThreadGroup.sendFile(file);
     }
 
-    public void addUser(Socket socket, String userName) {
-        UserThreadGroup threadGroup = new UserThreadGroup(this, userName, socket);
-        userThreadMap.put(userName, threadGroup);
-
-    }
-
-    public void removeUser(String userName) {
-
-        UserThreadGroup userThreadGroup = userThreadMap.get(userName);
-        //TODO: signal threads to stop, isDaemon?
-        userThreadGroup.destroy();
-
-        userThreadMap.remove(userName);
+    public void addUser(Socket socket, String userId) {
+        UserThreadGroup threadGroup = new UserThreadGroup(this, userId, socket);
+        userIdThreadMap.put(userId, threadGroup);
     }
 
 
-    public void onFileReceived(File file) {
-
+    public void onFileReceived(String userId, File file) {
+        presenter.onFileReceived(userId, file);
     }
 
-    public void onMessageReceived(Message message) {
-
-
+    public void onMessageReceived(String userId, String messageString) {
+        presenter.onMessageReceived(userId, messageString);
     }
 }

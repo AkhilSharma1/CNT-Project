@@ -16,14 +16,14 @@ public class Message {
     private String fromUser;
     private String toUser;
     private String excludeUser;
-    private String filePath;
+    private String fileName;
     private String message;
 
-    public Message(String fromUser, String toUser, String excludeUser, String filePath, String message) {
+    public Message(String fromUser, String toUser, String excludeUser, String fileName, String message) {
         this.fromUser = fromUser;
         this.toUser = toUser;
         this.excludeUser = excludeUser;
-        this.filePath = filePath;
+        this.fileName = fileName;
         this.message = message;
     }
 
@@ -39,8 +39,8 @@ public class Message {
         return excludeUser;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public String getFileName() {
+        return fileName;
     }
 
     public String getMessage() {
