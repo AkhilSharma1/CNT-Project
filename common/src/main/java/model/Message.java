@@ -17,14 +17,20 @@ public class Message {
     private String toUser;
     private String excludeUser;
     private String fileName;
+    private long fileLength;
     private String message;
 
-    public Message(String fromUser, String toUser, String excludeUser, String fileName, String message) {
+    public Message(String fromUser, String toUser, String excludeUser, String fileName, long fileLength, String message) {
         this.fromUser = fromUser;
         this.toUser = toUser;
         this.excludeUser = excludeUser;
         this.fileName = fileName;
+        this.fileLength = fileLength;
         this.message = message;
+    }
+
+    public long getFileLength() {
+        return fileLength;
     }
 
     public String getFromUser() {

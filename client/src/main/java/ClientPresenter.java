@@ -26,7 +26,7 @@ public class ClientPresenter extends Presenter {
             Socket requestSocket = new Socket("localhost", 8080);
             createNewConnection(requestSocket, SERVER_NAME);
             //send a broadcast message to all other users
-            Message joinBroadcastMessage = new Message(userName, null, null, null, "@" + userName + " joined!");
+            Message joinBroadcastMessage = new Message(userName, null, null, null, 0, "@" + userName + " joined!");
             sendMessage(SERVER_NAME, joinBroadcastMessage);
         } catch (IOException e) {
             e.printStackTrace();
@@ -135,23 +135,23 @@ public class ClientPresenter extends Presenter {
 
         if (isBroadcast) {
             if (isFile) {
-                message = new Message(userName, null, null, file.getName(), null);
+                message = new Message(userName, null, null, file.getName(), file.length(), null);
             } else if (isText) {
-                message = new Message(userName, null, null, null, messageText);
+                message = new Message(userName, null, null, null, 0, messageText);
             }
 
         } else if (isBlockcast) {
             if (isFile) {
-                message = new Message(userName, null, clientName, file.getName(), null);
+                message = new Message(userName, null, clientName, file.getName(), file.length(), null);
             } else if (isText) {
-                message = new Message(userName, null, clientName, null, messageText);
+                message = new Message(userName, null, clientName, null, 0, messageText);
             }
 
         } else if (isUnicast) {
             if (isFile) {
-                message = new Message(userName, clientName, null, file.getName(), null);
+                message = new Message(userName, clientName, null, file.getName(), file.length(), null);
             } else if (isText) {
-                message = new Message(userName, clientName, null, null, messageText);
+                message = new Message(userName, clientName, null, null, 0, messageText);
             }
 
         }
@@ -163,7 +163,7 @@ public class ClientPresenter extends Presenter {
     @Override
     public void onFileReceived(String fromUserId, File file) {
         String consoleOutput = "@" + fromUserId + " : " + " file " + file.getName() +
-                "received succesfully";
+                " received successfully";
         view.showOutput(consoleOutput);
 
     }

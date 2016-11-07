@@ -9,17 +9,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class SenderThread extends Thread {
 
 
-    private final OutputStreamWriter osw;
-    private final OutputStream out;
+    private final BufferedOutputStream out;
     private final ArrayBlockingQueue arrayBlockingQueue;
 
     SenderThread(ThreadGroup threadGroup, String sender, OutputStream out, ArrayBlockingQueue arrayBlockingQueue) {
         super(threadGroup, sender);
-        osw = new OutputStreamWriter(out);
-        this.out = out;
+        this.out = new BufferedOutputStream(out);
         this.arrayBlockingQueue = arrayBlockingQueue;
     }
-
 
     @Override
     public void run() {
@@ -38,42 +35,45 @@ public class SenderThread extends Thread {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-
         }
-
-
     }
 
-    public void sendMessage(String jsonString) {
-        try {
-            osw.write(jsonString + "\n");
-            osw.flush();
+    void sendMessage(String jsonString) {
 
+        try {
+           /* IOUtils.write(jsonString.getBytes(),out);
+             out.flush();*/
+
+            out.write((jsonString + "\n").getBytes());
+            out.flush();
         } catch (IOException e) {
+            System.out.println("1");
             e.printStackTrace();
         }
-
+        System.out.println("send string is " + jsonString);
 
     }
 
     public void sendFile(File file) {
         try {
-            byte[] bytes = new byte[16 * 1024];
-            InputStream in = new FileInputStream(file);
-            int count;
-            while ((count = in.read(bytes)) > 0) {
-                out.write(bytes, 0, count);
-            }
-            out.flush();
+
+            byte[] bFile = new byte[(int) file.length()];
+
+            FileInputStream in = new FileInputStream(file);
+
+            in.read(bFile);
             in.close();
 
+            out.write(bFile);
+            out.flush();
+            System.out.println("file buf sent " + bFile.length);
+
+//            IOUtils.copy(in,out);
+//            in.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 }

@@ -24,7 +24,7 @@ public class ServerPresenter extends Presenter {
 
 
     public void onStart() {
-        view.showOutput("Welcome! ServerPresenter is starting...");
+        view.showOutput("Welcome! Server is starting...");
         view.showOutput("Type quit to close server");
 
         //TODO read port number from a config file
@@ -98,7 +98,7 @@ public class ServerPresenter extends Presenter {
     private void sendWelcomeMessage(String newUserName) {
         String welcomeMessageText = createWelcomeMessage(newUserName,
                 new ArrayList<String>(userMap.values()));
-        Message welcomeMessage = new Message("server", newUserName, null, null, welcomeMessageText);
+        Message welcomeMessage = new Message("server", newUserName, null, null, 0, welcomeMessageText);
 
         sendMessage(getUserIdFromUserName(newUserName), welcomeMessage);
     }
@@ -145,7 +145,8 @@ public class ServerPresenter extends Presenter {
         for (ListIterator<Message> iterator = waitingList.listIterator(); iterator.hasNext(); ) {
             Message message = iterator.next();
 
-            if (message.getFromUser().equalsIgnoreCase(fromUserId) && fileName.equalsIgnoreCase(message.getFileName())) {
+            String fromId = getUserIdFromUserName(message.getFromUser());
+            if (fromId.equalsIgnoreCase(fromUserId) && fileName.equalsIgnoreCase(message.getFileName())) {
                 iterator.remove();
                 processReceivedMessage(message, file);
             }
@@ -188,6 +189,7 @@ public class ServerPresenter extends Presenter {
         }
 
         if (isBroadcast) {
+            System.out.println("in broadcast");
             sendMultipleMessages(fromUserName, null, message);
             if (isFileMessage) {
                 sendMultipleFiles(fromUserName, null, file);
