@@ -1,5 +1,7 @@
 package worker;
 
+import model.Message;
+
 import java.io.File;
 import java.net.Socket;
 import java.util.HashMap;
@@ -10,26 +12,24 @@ import java.util.HashMap;
 public class ThreadManager implements WorkerContract {
 
 
+    public static String userName;
     private static HashMap<String, UserThreadGroup> userIdThreadMap = new HashMap<>();
     private final onDataReceiveCallback presenter;
 
 
-    public ThreadManager(WorkerContract.onDataReceiveCallback presenter) {
+    public ThreadManager(onDataReceiveCallback presenter, String userName) {
         this.presenter = presenter;
+        ThreadManager.userName = userName;
     }
 
 
     @Override
-    public void sendMessage(String toUserId, String messageJsonString) {
+    public void sendMessage(String toUserId, Message message) {
         UserThreadGroup userThreadGroup = userIdThreadMap.get(toUserId);
-        userThreadGroup.sendMessageJson(messageJsonString);
+        userThreadGroup.sendMessage(message);
     }
 
-    @Override
-    public void sendFile(String toUserId, File file) {
-        UserThreadGroup userThreadGroup = userIdThreadMap.get(toUserId);
-        userThreadGroup.sendFile(file);
-    }
+
 
     public void addUser(Socket socket, String userId) {
         UserThreadGroup threadGroup = new UserThreadGroup(this, userId, socket);
@@ -41,7 +41,7 @@ public class ThreadManager implements WorkerContract {
         presenter.onFileReceived(userId, file);
     }
 
-    public void onMessageReceived(String userId, String messageString) {
-        presenter.onMessageReceived(userId, messageString);
+    public void onMessageReceived(String userId, Message message) {
+        presenter.onMessageReceived(userId, message);
     }
 }

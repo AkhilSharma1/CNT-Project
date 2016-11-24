@@ -1,8 +1,6 @@
 package worker;
 
-import com.google.gson.Gson;
 import model.Message;
-import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 
@@ -13,8 +11,7 @@ public class ReceiverThread extends Thread {
 
     public static long TIME_OUT = 3000;
     private final UserThreadGroup threadGroup;
-    private final InputStream inputStream;
-    private BufferedInputStream bufferedInputStream = null;
+    private ObjectInputStream objectInputStream;
     private volatile boolean stopped = false;
     private long fileLength;
     private String toUser;
@@ -24,33 +21,38 @@ public class ReceiverThread extends Thread {
     public ReceiverThread(UserThreadGroup threadGroup, String receiver, InputStream inputStream) {
         super(threadGroup, receiver);
         this.threadGroup = threadGroup;
-        bufferedInputStream = new BufferedInputStream(inputStream);
-        this.inputStream = inputStream;
+        try {
+            objectInputStream = new ObjectInputStream(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void run() {
         while (!stopped) {
-            System.out.println("receiver loop");
+            Message message = null;
+
             try {
-                if (fileLength != 0) {
-                    System.out.println("1111111111111111111");
-                    byte[] bytes = new byte[(int) fileLength];
-                    IOUtils.readFully(inputStream, bytes);
-                    fileLength = 0;
+                message = (Message) objectInputStream.readObject();
+                fileName = message.getFileName();
 
-
-                    fileReceived(bytes);
-                } else {
-                    System.out.println("22222222222222");
-
-                    java.util.Scanner s = new java.util.Scanner(bufferedInputStream).useDelimiter("\n");
-                    String receivedString = s.hasNext() ? s.next() : "";
-
-                    textMessageReceived(receivedString);
+                textMessageReceived(message);
+                if (fileName != null) {
+                    fileLength = message.getFileLength();
+                    toUser = message.getToUser();
+                    fileReceived(message.getFileData());
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
+                System.exit(1);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.exit(1);
+
+            } finally {
             }
 
 
@@ -59,12 +61,14 @@ public class ReceiverThread extends Thread {
 
 
     void fileReceived(byte[] bytes) {
-        System.out.println(this.getName());
+
+
         try {
             String path = "Received/";
+            System.out.println("touser : " + toUser);
 
             if (this.getName().equalsIgnoreCase("server_receiver")) //client side receiver thread
-                path += toUser + "/";
+                path += ThreadManager.userName + "/";
             else
                 path += "server/";    //server side receiver thread
 
@@ -78,7 +82,6 @@ public class ReceiverThread extends Thread {
             fileOuputStream.write(bytes);
             fileOuputStream.flush();
             fileOuputStream.close();
-            System.out.println("33333333333333333");
 
             File file = new File(path);
             System.out.println(file.getCanonicalPath());
@@ -93,14 +96,9 @@ public class ReceiverThread extends Thread {
     }
 
 
-    void textMessageReceived(String messageString) {
-        System.out.println("message string :" + messageString);
-        Gson gson = new Gson();
-        Message message = gson.fromJson(messageString, Message.class);
-        fileLength = message.getFileLength();
-        toUser = message.getToUser();
-        fileName = message.getFileName();
-        threadGroup.onMessageReceived(messageString);
+    void textMessageReceived(Message message) {
+
+        threadGroup.onMessageReceived(message);
     }
 
 }

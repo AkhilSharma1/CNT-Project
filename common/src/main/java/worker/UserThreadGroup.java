@@ -1,5 +1,7 @@
 package worker;
 
+import model.Message;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
@@ -18,7 +20,7 @@ class UserThreadGroup extends ThreadGroup {
     private final Socket socket;
     private ReceiverThread receiverThread;
     private SenderThread senderThread;
-    private ArrayBlockingQueue arrayBlockingQueue;
+    private ArrayBlockingQueue<Message> arrayBlockingQueue;
     UserThreadGroup(ThreadManager threadManager, String userId, Socket socket) {
         super(userId);
         this.threadManager = threadManager;
@@ -39,7 +41,7 @@ class UserThreadGroup extends ThreadGroup {
 
     private void initThreads(String userName, Socket socket) throws IOException {
 
-        arrayBlockingQueue = new ArrayBlockingQueue(10);
+        arrayBlockingQueue = new ArrayBlockingQueue<Message>(10);
 
         senderThread = new SenderThread(this, userName + SENDER_THREAD_NAME,
                 socket.getOutputStream(), arrayBlockingQueue);
@@ -67,17 +69,9 @@ class UserThreadGroup extends ThreadGroup {
     }
 
 
-    public void sendMessageJson(String jsonString) {
+    public void sendMessage(Message message) {
         try {
-            arrayBlockingQueue.put(jsonString);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void sendFile(File file) {
-        try {
-            arrayBlockingQueue.put(file);
+            arrayBlockingQueue.put(message);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -87,7 +81,7 @@ class UserThreadGroup extends ThreadGroup {
         threadManager.onFileReceived(userId, file);
     }
 
-    public void onMessageReceived(String messageString) {
-        threadManager.onMessageReceived(userId, messageString);
+    public void onMessageReceived(Message message) {
+        threadManager.onMessageReceived(userId, message);
     }
 }

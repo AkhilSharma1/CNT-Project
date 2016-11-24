@@ -18,7 +18,7 @@ public class ServerPresenter extends Presenter {
     private ArrayList<Message> waitingList = new ArrayList<>();
 
     public ServerPresenter(ViewContract view) {
-        super(view);
+        super(view, "server");
         onStart();
     }
 
@@ -170,31 +170,17 @@ public class ServerPresenter extends Presenter {
 
         if (isUnicast) {
             sendMessage(getUserIdFromUserName(toUserName), message);
-            if (isFileMessage) {
-                sendFile(getUserIdFromUserName(toUserName), file);
-                view.showOutput("@" + fromUserName + " sending file to @" + toUserName);
-
-            }
             return;
         }
 
         if (isBlockcast) {
             sendMultipleMessages(fromUserName, excludeUserName, message);
-            if (isFileMessage) {
-                sendMultipleFiles(fromUserName, excludeUserName, file);
-                view.showOutput("@" + fromUserName + " sending file to all users except @" + excludeUserName);
-
-            }
             return;
         }
 
         if (isBroadcast) {
             System.out.println("in broadcast");
             sendMultipleMessages(fromUserName, null, message);
-            if (isFileMessage) {
-                sendMultipleFiles(fromUserName, null, file);
-                view.showOutput("@" + fromUserName + " sending file to all users");
-            }
         }
 
     }
@@ -208,16 +194,6 @@ public class ServerPresenter extends Presenter {
         return null;
     }
 
-    private void sendMultipleFiles(String fromUserName, String excludeUserName, File file) {
-
-        for (Map.Entry<String, String> entry : userMap.entrySet()) {
-            String userId = entry.getKey();
-            String userName = entry.getValue();
-            if (!(userName.equalsIgnoreCase(fromUserName) || userName.equalsIgnoreCase(excludeUserName))) {
-                sendFile(userId, file);
-            }
-        }
-    }
 
     private void sendMultipleMessages(String fromUserName, String excludeUserName, Message message) {
         //send message to all except sender and blocked userIds
@@ -225,8 +201,7 @@ public class ServerPresenter extends Presenter {
             String userId = entry.getKey();
             String userName = entry.getValue();
             if (!(userName.equalsIgnoreCase(fromUserName) || userName.equalsIgnoreCase(excludeUserName))) {
-                message.setToUser(userName);
-
+                message.setToUser(userName + "");
                 sendMessage(userId, message);
 
             }

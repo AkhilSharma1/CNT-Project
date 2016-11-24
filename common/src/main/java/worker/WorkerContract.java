@@ -1,5 +1,7 @@
 package worker;
 
+import model.Message;
+
 import java.io.File;
 import java.net.Socket;
 
@@ -11,16 +13,15 @@ public interface WorkerContract {
     /* Implemented by the entity which manages threads*/
 
 
-    void sendMessage(String toUserId, String messageJsonString);
+    void sendMessage(String toUserId, Message message);
 
-    void sendFile(String toUserId, File file);
 
     void addUser(Socket socket, String userName);
 
     interface onDataReceiveCallback {
         void onFileReceived(String fromUserId, File file);
 
-        void onMessageReceived(String fromUserId, String messageString);
+        void onMessageReceived(String fromUserId, Message message);
     }
 
 }

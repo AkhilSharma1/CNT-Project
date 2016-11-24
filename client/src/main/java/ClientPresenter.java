@@ -1,4 +1,5 @@
 import model.Message;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -14,7 +15,7 @@ public class ClientPresenter extends Presenter {
     private final String userName;
 
     public ClientPresenter(ClientConsoleView clientConsoleView, String userName) {
-        super(clientConsoleView);
+        super(clientConsoleView, userName);
         this.userName = userName;
 
         onStart();
@@ -51,11 +52,18 @@ public class ClientPresenter extends Presenter {
     }
 
     public void sendData(Message message) {
-        sendMessage(SERVER_NAME, message);
+
         if (message.getFileName() != null) {
             File file = new File(message.getFileName());
-            sendFile("server", file);
+            try {
+                message.setFileData(FileUtils.readFileToByteArray(file));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
+        sendMessage(SERVER_NAME, message);
     }
 
     @Override

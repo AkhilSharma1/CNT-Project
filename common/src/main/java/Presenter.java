@@ -1,9 +1,7 @@
-import com.google.gson.Gson;
 import model.Message;
 import worker.ThreadManager;
 import worker.WorkerContract;
 
-import java.io.File;
 import java.net.Socket;
 
 /**
@@ -12,15 +10,13 @@ import java.net.Socket;
 public abstract class Presenter implements PresenterContract, WorkerContract.onDataReceiveCallback {
 
 
-    private final Gson gson;
     ViewContract view;
     //TODO use a dependency injector such as dagger2
     private WorkerContract worker;
 
-    Presenter(ViewContract view) {
-        gson = new Gson();
+    Presenter(ViewContract view, String userName) {
         this.view = view;
-        worker = new ThreadManager(this);
+        worker = new ThreadManager(this, userName);
     }
 
 
@@ -47,13 +43,7 @@ public abstract class Presenter implements PresenterContract, WorkerContract.onD
     }
 
     void sendMessage(String toUserId, Message message) {
-        String messageJsonString = gson.toJson(message);
-        worker.sendMessage(toUserId, messageJsonString);
-
-    }
-
-    void sendFile(String toUserId, File file) {
-        worker.sendFile(toUserId, file);
+        worker.sendMessage(toUserId, message);
     }
 
 
@@ -62,9 +52,8 @@ public abstract class Presenter implements PresenterContract, WorkerContract.onD
     }
 
     @Override
-    final public void onMessageReceived(String fromUserId, String messageString) {
+    final public void onMessageReceived(String fromUserId, Message message) {
 
-        Message message = gson.fromJson(messageString, Message.class);
 
         boolean isTextMessage = message.getMessage() != null;
 
