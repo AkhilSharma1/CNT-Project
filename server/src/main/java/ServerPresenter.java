@@ -225,7 +225,10 @@ public class ServerPresenter extends Presenter {
             String userId = entry.getKey();
             String userName = entry.getValue();
             if (!(userName.equalsIgnoreCase(fromUserName) || userName.equalsIgnoreCase(excludeUserName))) {
+                message.setToUser(userName);
+
                 sendMessage(userId, message);
+
             }
         }
     }

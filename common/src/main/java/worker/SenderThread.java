@@ -1,5 +1,7 @@
 package worker;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -62,14 +64,18 @@ public class SenderThread extends Thread {
             FileInputStream in = new FileInputStream(file);
 
             in.read(bFile);
-            in.close();
+//            in.close();
 
-            out.write(bFile);
+           /* out.write(bFile);
             out.flush();
             System.out.println("file buf sent " + bFile.length);
+            out.flush();
+            out.flush();
+            out.flush();*/
 
-//            IOUtils.copy(in,out);
-//            in.close();
+
+            IOUtils.copy(in, out);
+            in.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

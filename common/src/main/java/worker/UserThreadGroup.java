@@ -19,8 +19,6 @@ class UserThreadGroup extends ThreadGroup {
     private ReceiverThread receiverThread;
     private SenderThread senderThread;
     private ArrayBlockingQueue arrayBlockingQueue;
-
-
     UserThreadGroup(ThreadManager threadManager, String userId, Socket socket) {
         super(userId);
         this.threadManager = threadManager;
@@ -33,6 +31,10 @@ class UserThreadGroup extends ThreadGroup {
             e.printStackTrace();
         }
 
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     private void initThreads(String userName, Socket socket) throws IOException {

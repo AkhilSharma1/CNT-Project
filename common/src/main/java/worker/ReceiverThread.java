@@ -5,7 +5,6 @@ import model.Message;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
-import java.util.Random;
 
 /**
  * Created by akhil on 25/9/16.
@@ -18,6 +17,8 @@ public class ReceiverThread extends Thread {
     private BufferedInputStream bufferedInputStream = null;
     private volatile boolean stopped = false;
     private long fileLength;
+    private String toUser;
+    private String fileName;
 
 
     public ReceiverThread(UserThreadGroup threadGroup, String receiver, InputStream inputStream) {
@@ -33,13 +34,19 @@ public class ReceiverThread extends Thread {
             System.out.println("receiver loop");
             try {
                 if (fileLength != 0) {
+                    System.out.println("1111111111111111111");
                     byte[] bytes = new byte[(int) fileLength];
                     IOUtils.readFully(inputStream, bytes);
                     fileLength = 0;
+
+
                     fileReceived(bytes);
                 } else {
+                    System.out.println("22222222222222");
+
                     java.util.Scanner s = new java.util.Scanner(bufferedInputStream).useDelimiter("\n");
                     String receivedString = s.hasNext() ? s.next() : "";
+
                     textMessageReceived(receivedString);
                 }
             } catch (IOException e) {
@@ -54,19 +61,29 @@ public class ReceiverThread extends Thread {
     void fileReceived(byte[] bytes) {
         System.out.println(this.getName());
         try {
-            Random random = new Random();
-            String path = "/home/akhil/cnt/Received/test";
+            String path = "Received/";
 
-            if (this.getName().equalsIgnoreCase("server_receiver"))
-                path += "server_receiver";
+            if (this.getName().equalsIgnoreCase("server_receiver")) //client side receiver thread
+                path += toUser + "/";
+            else
+                path += "server/";    //server side receiver thread
+
+            File file1 = new File(path);
+            file1.mkdirs();
+
+
+            path += fileName;
 
             FileOutputStream fileOuputStream = new FileOutputStream(path);
             fileOuputStream.write(bytes);
             fileOuputStream.flush();
             fileOuputStream.close();
-            File file = new File(path);
+            System.out.println("33333333333333333");
 
-            System.out.println("file received");
+            File file = new File(path);
+            System.out.println(file.getCanonicalPath());
+
+
             threadGroup.onFileReceived(file);
 
         } catch (IOException e) {
@@ -77,9 +94,12 @@ public class ReceiverThread extends Thread {
 
 
     void textMessageReceived(String messageString) {
+        System.out.println("message string :" + messageString);
         Gson gson = new Gson();
         Message message = gson.fromJson(messageString, Message.class);
         fileLength = message.getFileLength();
+        toUser = message.getToUser();
+        fileName = message.getFileName();
         threadGroup.onMessageReceived(messageString);
     }
 

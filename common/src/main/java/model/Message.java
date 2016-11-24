@@ -19,7 +19,6 @@ public class Message {
     private String fileName;
     private long fileLength;
     private String message;
-
     public Message(String fromUser, String toUser, String excludeUser, String fileName, long fileLength, String message) {
         this.fromUser = fromUser;
         this.toUser = toUser;
@@ -39,6 +38,10 @@ public class Message {
 
     public String getToUser() {
         return toUser;
+    }
+
+    public void setToUser(String toUser) {
+        this.toUser = toUser;
     }
 
     public String getExcludeUser() {
