@@ -64,13 +64,12 @@ public class ReceiverThread extends Thread {
 
 
         try {
-            String path = "Received/";
-            System.out.println("touser : " + toUser);
+            String path = "Received" + File.separator;
 
             if (this.getName().equalsIgnoreCase("server_receiver")) //client side receiver thread
-                path += ThreadManager.userName + "/";
+                path += ThreadManager.userName + File.separator;
             else
-                path += "server/";    //server side receiver thread
+                path += "server" + File.separator;    //server side receiver thread
 
             File file1 = new File(path);
             file1.mkdirs();
